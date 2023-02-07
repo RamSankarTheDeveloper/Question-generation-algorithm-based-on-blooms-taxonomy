@@ -2,7 +2,7 @@ import spacy
 nlp = spacy.load("en_core_web_sm")
 
 #preprocessing:-after dividing into sentences, divide into tokens
-sent = "James is playing football in the field"
+sent = "James is playing football in the stadium at 8pm"
 subj,aux_verb,root_verb,obj,sent_list = [],[],[],[],[]
 doc = nlp(sent)
 for token in doc:
@@ -17,9 +17,22 @@ for token in doc:
   elif ((token.dep_ not in ["dobj",'iobj','oprd','obj',"pobj"]) and (not obj)):
     obj = token.text
   
-
+#without coref and ent 
 for item in sent_list:
   if item in subj:
     print("who")
   else:
+    print(item)
+print("---")
+#with ent not coref
+ent_label_list,ent_text_list=[],[]
+for entities in doc.ents:
+    #print(f"{entities.text:<25} {entities.label_:<15} {spacy.explain(entities.label_)}")
+    ent_text_list.append(entities.text)
+    ent_label_list.append(entities.label_)
+
+"""if item in entity list is present in subj/verb/obj,
+          then assign appropriate wh-question"""
+for item in ent_text_list:
+  if item in (subj or aux_verb or root_verb or obj or sent_list):
     print(item)
