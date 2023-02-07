@@ -1,23 +1,25 @@
 import spacy
 nlp = spacy.load("en_core_web_sm")
-sent = "The players were determined"
-subj = aux_verb = root_verb = obj = None
-list_sent=[]
+
+#preprocessing:-after dividing into sentences, divide into tokens
+sent = "James is playing football in the field"
+subj,aux_verb,root_verb,obj,sent_list = [],[],[],[],[]
 doc = nlp(sent)
 for token in doc:
-  if obj!=None:
-    list_sent.append(token)
-    continue
+  sent_list.append(token.text)
   print(token.dep_)
-  if (token.dep_ == "nsubjpass") :
-    subj = token
-  if (token.dep_ == "ROOT"):
-    root_verb = token
-  if (token.dep_ == "auxpass"):
-    aux_verb = token
-  if (token.dep_ == "pobj"):
-    obj = token
+  if ((token.dep_  in ["nsubjpass",'csubjpass','nsubj','csubj']) and (not subj)) :
+    subj = token.text
+  elif (token.dep_ in ["ROOT","root"] and (not root_verb)):
+    root_verb = token.text
+  elif ((token.dep_ not in ["auxpass","AUX","MD","BES"]) and (not aux_verb)):
+    aux_verb = token.text
+  elif ((token.dep_ not in ["dobj",'iobj','oprd','obj',"pobj"]) and (not obj)):
+    obj = token.text
   
-print("what",aux_verb,subj,root_verb)
-for item in list_sent:
-  print(item)
+
+for item in sent_list:
+  if item in subj:
+    print("who")
+  else:
+    print(item)
