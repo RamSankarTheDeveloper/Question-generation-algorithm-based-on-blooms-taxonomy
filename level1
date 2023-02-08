@@ -2,14 +2,14 @@ import spacy
 nlp = spacy.load("en_core_web_sm")
 
 #preprocessing:-after dividing into sentences, divide into tokens
-sent = "James is playing football in the stadium at 8pm"
+sent = "James is playing football in the stadium in morning"
+doc = nlp(sent)
 def dep_conversion():
     global subj,aux_verb,root_verb,obj,sent_list #need to remove globals
-    subj,aux_verb,root_verb,obj,sent_list = [],[],[],[],[] #dep lists
-    doc = nlp(sent)
+    #subj,aux_verb,root_verb,obj,sent_list = [],[],[],[],[] #dep lists #note:replace variables with lists or dictionary for advanced nlp tasks 
+    subj,aux_verb,root_verb,obj,sent_list = [],[],[],[],[]
     for token in doc:
-      sent_list.append(token.text)
-      print(token.dep_)
+      sent_list.append(token)
       if ((token.dep_  in ["nsubjpass",'csubjpass','nsubj','csubj']) and (not subj)) :
         subj = token.text
       elif (token.dep_ in ["ROOT","root"] and (not root_verb)):
@@ -34,13 +34,36 @@ def ent_conversion():
     ent_label_list,ent_text_list=[],[]
     for entities in doc.ents:
         #print(f"{entities.text:<25} {entities.label_:<15} {spacy.explain(entities.label_)}")
-        ent_text_list.append(entities.text)
+        ent_text_list.append(entities)
         ent_label_list.append(entities.label_)
-    return ent_label_list,ent_text_list
 
 """if item in entity list is present in subj/verb/obj,
           then assign appropriate wh-question"""
-def check_ent_conversion():
+dep_conversion()
+ent_conversion()
+
+def check_ent_dep():
+  print("the items present in both entity list and subj/verb/obj lists are:")
   for item in ent_text_list:
-    if item in (subj or aux_verb or root_verb or obj or sent_list):
-      print(item)
+    if item.text==subj or obj or root_verb or aux_verb:
+      print(item,item.label_)
+      
+check_ent_dep()
+def question(wh,name):
+  question=[]
+  for item1 in sent_list:
+    #dict/df/list/class attributes/df+ML_model
+    if item1.text==name.text:
+      question.append(wh)
+    else:
+      question.append(item1.text)
+  print("\n",*question,"?",end=" ")
+for item in ent_text_list:
+  if item.label_ in {"TIME" , "DATE"}:
+    question("when",item)
+  if item.label_ in {"PERSON" , "NORP"}:
+    question("who",item)
+  if item.label_ in {"FACILITY" , "FAC","GPE",'LOC',"GPE","GPE_LOC"}:
+    question("where",item)
+  if item.label_ in {"PRODUCT" , "EVENT","WORK_OF_ART","LAW","LANGUAGE","PROD","GPE_ORG"}:
+    question("what",item)
