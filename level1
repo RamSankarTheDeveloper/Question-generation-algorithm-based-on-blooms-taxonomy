@@ -1,8 +1,9 @@
-import spacy
-nlp = spacy.load("en_core_web_sm")
+#import spacy
+#nlp = spacy.load("en_core_web_sm")
 
+#insert paragraph &/or sentence splitting here
 #preprocessing:-after dividing into sentences, divide into tokens
-sent = "James is playing football in the stadium in morning"
+sent = "TMSE is politically stronger than Aramco"
 doc = nlp(sent)
 def dep_conversion():
     global subj,aux_verb,root_verb,obj,sent_list #need to remove globals
@@ -59,14 +60,14 @@ def question(wh,name):
       question.append(item1.text)
   print("\n",*question,"?",end=" ")
 for item in ent_text_list:
-  if item.label_ in {"TIME" , "DATE"}:
+  if item.label_ in {"TIME","DATE"}:
     question("when",item)
-  if item.label_ in {"PERSON" , "NORP"}:
+  if item.label_ in {"PERSON","NORP"}:
     question("who",item)
-  if item.label_ in {"FACILITY" , "FAC","GPE",'LOC',"GPE","GPE_LOC"}:
+  if item.label_ in {"FACILITY","FAC","GPE",'LOC',"GPE","GPE_LOC"}:
     question("where",item)
-  if item.label_ in {"PRODUCT" , "EVENT","WORK_OF_ART","LAW","LANGUAGE","PROD","GPE_ORG"}:
+  if item.label_ in {"PRODUCT","EVENT","WORK_OF_ART","LAW","LANGUAGE","PROD","ORG","GPE_ORG"}:
     question("what",item)
 
-"""insert other L1 question words like 'list','match','tell' etc here"""
-"""insert coref code here"""
+#"""insert other L1question words like 'list','match','tell' etc here"""
+#insert coref code here
