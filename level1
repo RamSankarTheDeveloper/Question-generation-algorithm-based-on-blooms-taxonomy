@@ -67,3 +67,6 @@ for item in ent_text_list:
     question("where",item)
   if item.label_ in {"PRODUCT" , "EVENT","WORK_OF_ART","LAW","LANGUAGE","PROD","GPE_ORG"}:
     question("what",item)
+
+"""insert other L1 question words like 'list','match','tell' etc here"""
+"""insert coref code here"""
