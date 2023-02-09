@@ -55,6 +55,7 @@ def question(wh,name):
   for item1 in sent_list:
     #dict/df/list/class attributes/df+ML_model
     if item1.text==name.text:
+    #check multiple words
       question.append(wh)
     else:
       question.append(item1.text)
