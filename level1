@@ -1,74 +1,85 @@
 #import spacy
 #nlp = spacy.load("en_core_web_sm")
-
 #insert paragraph &/or sentence splitting here
 #preprocessing:-after dividing into sentences, divide into tokens
-sent = "TMSE is politically stronger than Aramco"
-doc = nlp(sent)
-def dep_conversion():
-    global subj,aux_verb,root_verb,obj,sent_list #need to remove globals
-    #subj,aux_verb,root_verb,obj,sent_list = [],[],[],[],[] #dep lists #note:replace variables with lists or dictionary for advanced nlp tasks 
-    subj,aux_verb,root_verb,obj,sent_list = [],[],[],[],[]
-    for token in doc:
-      sent_list.append(token)
-      if ((token.dep_  in ["nsubjpass",'csubjpass','nsubj','csubj']) and (not subj)) :
-        subj = token.text
-      elif (token.dep_ in ["ROOT","root"] and (not root_verb)):
-        root_verb = token.text
-      elif ((token.dep_ not in ["auxpass","AUX","MD","BES"]) and (not aux_verb)):
-        aux_verb = token.text
-      elif ((token.dep_ not in ["dobj",'iobj','oprd','obj',"pobj"]) and (not obj)):
-        obj = token.text
-  
-#without coref and ent 
-def check_dep_conversion(dep_list):
-    for item in sent_list:
-      if item in dep_list:
-        print("who")
+class l1:
+ def __init__(self):
+   self.subj,self.aux_verb,self.root_verb,self.obj,self.sent_list,self.ent_label_list,self.ent_text_list  = [],[],[],[],[],[],[]
+
+ def tokenizing(self):
+  doc = nlp(sentence)
+  for token in doc:
+    self.sent_list.append(token)
+  return sent_list
+ def dep_conversion(self):
+      #global subj,aux_verb,root_verb,obj,sent_list #need to remove globals
+      #subj,aux_verb,root_verb,obj,sent_list = [],[],[],[],[] #dep lists #note:replace variables with lists or dictionary for advanced nlp tasks 
+      #subj,aux_verb,root_verb,obj,sent_list = [],[],[],[],[]
+      for token in doc:
+        if ((token.dep_  in ["nsubjpass",'csubjpass','nsubj','csubj']) and (not self.subj)) :
+          self.subj = token.text
+        elif (token.dep_ in ["ROOT","root"] and (not self.root_verb)):
+          self.root_verb = token.text
+        elif ((token.dep_ not in ["auxpass","AUX","MD","BES"]) and (not self.aux_verb)):
+          self.aux_verb = token.text
+        elif ((token.dep_ not in ["dobj",'iobj','oprd','obj',"pobj"]) and (not self.obj)):
+          self.obj = token.text
+
+  #without coref and ent 
+ def check_dep_conversion(self,dep_list):#dep list is subj/verb/obj
+      self.dep_list=dep_list
+      for item in self.sent_list:
+        if item in self.dep_list:
+          print("who")#need more wh
+        else:
+          print(item)
+      print("---")
+
+  #with ent not coref
+ def ent_conversion(self):
+      #global ent_label_list,ent_text_list
+      #ent_label_list,ent_text_list=[],[]
+      for entities in self.doc.ents:
+          #print(f"{entities.text:<25} {entities.label_:<15} {spacy.explain(entities.label_)}")
+          self.ent_text_list.append(entities)
+          self.ent_label_list.append(entities.label_)
+
+#if item in entity list is present in subj/verb/obj,
+#            then assign appropriate wh-question"""
+
+
+ def check_ent_dep(self):
+    print("the items present in both entity list and subj/verb/obj lists are:")
+    for item in self.ent_text_list:
+      if item.text==subj or obj or root_verb or aux_verb:
+        print(item,item.label_)
+        
+
+ def question(self,wh,name):
+    question=[]
+    for item1 in self.sent_list:
+      #dict/df/list/class attributes/df+ML_model
+      if item1.text==name.text:
+      #check multiple words
+        question.append(wh)
       else:
-        print(item)
-    print("---")
+        question.append(item1.text)
+    print("\n",*question,"?",end=" ")
+    for item in ent_text_list:
+     if item.label_ in {"TIME","DATE"}:
+      question("when",item)
+     if item.label_ in {"PERSON","NORP"}:
+      question("who",item)
+     if item.label_ in {"FACILITY","FAC","GPE",'LOC',"GPE","GPE_LOC"}:
+      question("where",item)
+     if item.label_ in {"PRODUCT","EVENT","WORK_OF_ART","LAW","LANGUAGE","PROD","ORG","GPE_ORG"}:
+      question("what",item)
 
-#with ent not coref
-def ent_conversion():
-    global ent_label_list,ent_text_list
-    ent_label_list,ent_text_list=[],[]
-    for entities in doc.ents:
-        #print(f"{entities.text:<25} {entities.label_:<15} {spacy.explain(entities.label_)}")
-        ent_text_list.append(entities)
-        ent_label_list.append(entities.label_)
 
-"""if item in entity list is present in subj/verb/obj,
-          then assign appropriate wh-question"""
-dep_conversion()
-ent_conversion()
+    #"""insert other L1question words like 'list','match','tell' etc here"""
+    #insert coref code here
 
-def check_ent_dep():
-  print("the items present in both entity list and subj/verb/obj lists are:")
-  for item in ent_text_list:
-    if item.text==subj or obj or root_verb or aux_verb:
-      print(item,item.label_)
-      
-check_ent_dep()
-def question(wh,name):
-  question=[]
-  for item1 in sent_list:
-    #dict/df/list/class attributes/df+ML_model
-    if item1.text==name.text:
-    #check multiple words
-      question.append(wh)
-    else:
-      question.append(item1.text)
-  print("\n",*question,"?",end=" ")
-for item in ent_text_list:
-  if item.label_ in {"TIME","DATE"}:
-    question("when",item)
-  if item.label_ in {"PERSON","NORP"}:
-    question("who",item)
-  if item.label_ in {"FACILITY","FAC","GPE",'LOC',"GPE","GPE_LOC"}:
-    question("where",item)
-  if item.label_ in {"PRODUCT","EVENT","WORK_OF_ART","LAW","LANGUAGE","PROD","ORG","GPE_ORG"}:
-    question("what",item)
 
-#"""insert other L1question words like 'list','match','tell' etc here"""
-#insert coref code here
+sentence="The difference between you and me is that I am a better runner"
+sent1 = l1()
+l1.tokenizing(sentence)
